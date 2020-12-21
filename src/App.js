@@ -1,74 +1,52 @@
-import React, {useState, useEffect} from 'react'
-import axios from 'axios';
+import React, {useEffect, useState, useCallback} from 'react'
 
 const App = function () {
-  const [users, setUsers] = useState(null);
+    const [text, setText] = useState('')
+    const [post, setPost] = useState('')
+    const [savedPost, setSavedPost] = useState('')
 
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  useEffect(() => {
-    axios
-        .get("/api/users")
-        .then((users) => setUsers(users))
-        .catch((err) => console.log(err));
-  }, []);
+    const fetchData = async () => {
+        const resp = await fetch('/api/hello')
+        return await resp.json()
+    }
 
-  function submitForm() {
-    if (username === "") {
-      alert("Please fill the username field");
-      return;
-    }
-    if (email === "") {
-      alert("Please fill the email field");
-      return;
-    }
-    axios
-        .post("/api/users", {
-          username: username,
-          email: email,
-        })
-        .then(function () {
-          console.log("Account created successfully");
-        })
-        .catch(function () {
-          console.log("Could not creat account. Please try again");
+    useEffect( () => {
+        fetchData()
+            .then(res => setText(res.express))
+            .catch(e => console.log(e))
+    }, [])
+
+    const handleChange = useCallback((e) => {
+        setPost(e.target.value)
+    }, [setPost])
+
+
+    const handleSubmit = useCallback(async (e) => {
+        e.preventDefault()
+        const response = await fetch('/api/world', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ post: post }),
         });
-  }
-  return (
-      <>
-        <h1>My Project</h1>
-        {users === null ? (
-            <p>Loading...</p>
-        ) : users.length === 0 ? (
-            <p>No user available</p>
-        ) : (
-            <>
-              <h2>Available Users</h2>
-              <ol>
-                {users.data.map((user, index) => (
-                    <li key={index}>
-                      Name: {user.name} - Email: {user.email}
-                    </li>
-                ))}
-              </ol>
-            </>
-        )}
+        const body = await response.text();
+        setSavedPost(body)
+    }, [post])
 
-        <form onSubmit={submitForm}>
-          <input
-              onChange={(e) => setUsername(e.target.value)}
-              type="text"
-              placeholder="Enter your username"
-          />
-          <input
-              onChange={(e) => setEmail(e.target.value)}
-              type="text"
-              placeholder="Enter your email address"
-          />
-          <input type="submit" />
-        </form>
-      </>
-  );
+  return (
+      <div>
+          {text}
+          <form
+              onSubmit={handleSubmit}
+          >
+              <input type="text" value={post} onChange={handleChange}/>
+              <button type="submit">Submit</button>
+          </form>
+          <p>{savedPost}</p>
+      </div>
+      
+  )
 };
 
 export default App;
