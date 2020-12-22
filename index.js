@@ -2,11 +2,16 @@ const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
 
+require('./backend/config/db');
+
 const app = express();
 const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+const users = require('./backend/api/users');
+app.use('/api/users', users);
 
 // API calls
 app.get('/api/hello', (req, res) => {
