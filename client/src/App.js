@@ -1,9 +1,14 @@
 import React, {useEffect, useState, useCallback} from 'react'
 import axios from "axios";
 
+import style from './App.module.css'
+
 const App = function () {
     const [users, setUsers] = useState([])
     const [username, setUsername] = useState("")
+
+    const [user, setUser] = useState('')
+    const [message, setMessage] = useState('')
 
     useEffect(() => {
         axios
@@ -24,6 +29,7 @@ const App = function () {
     }, [setUsername])
 
     const handleSubmit = useCallback((e) => {
+        e.preventDefault()
         if (username === "") {
             alert("Please fill the username field");
             return;
@@ -32,16 +38,20 @@ const App = function () {
             .post("/api/users", {
                 name: username
             })
-            .then(function () {
-                alert("Account created successfully");
+            .then(res => {
+                if (res?.data?.message) {
+                    setMessage(res.data.message)
+                } else {
+                    setUser(res.data.user)
+                    //window.location.reload()
+                }
             })
-            .catch(function () {
-                alert("Could not creat account. Please try again");
-            });
+            .catch(e => console.error(e));
     }, [username])
 
   return (
-      <div>
+      <div className={style.container}>
+          <div>
           <h1>My Project</h1>
           {users === null ? (
               <p>Loading...</p>
@@ -53,12 +63,17 @@ const App = function () {
                   <ol>
                       {users.data.map((user, index) => (
                           <li key={index}>
-                              Name: {user.name} - id: {user.id}
+                              <p>Name: {user.name}</p>
+                              <p>id: {user.id}</p>
+                              <p>giftTo: {user.giftTo}</p>
+                              <p>giftFrom: {user.giftFrom}</p>
                           </li>
                       ))}
                   </ol>
               </>
           )}
+          </div>
+          <div>
           <form onSubmit={handleSubmit}>
               <input
                   onChange={handleChange}
@@ -67,6 +82,9 @@ const App = function () {
               />
               <button type="submit">Submit</button>
           </form>
+          {user?.name && <p>{`Тебе достался ${user.name}`}</p>}
+          {message && <p>{message}</p>}
+          </div>
       </div>
   )
 }
