@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useReducer } from 'react'
 import axios from 'axios'
 import * as VFX from 'react-vfx'
+import Particles from 'react-particles-js'
 
 import face from './assets/face.png'
 
@@ -91,7 +92,7 @@ const App = function () {
         }
     }, [state.users, state.currentUserName])
 
-    const handleUpdate = useCallback(() => {
+    /* const handleUpdate = useCallback(() => {
         axios
             .put('/api/users', {})
             .then((res) => {
@@ -101,12 +102,71 @@ const App = function () {
                 }, 4000)
             })
             .catch(e => console.error(e))
-    }, [])
+    }, []) */
 
     return (
         <div className={style.container} >
+            <Particles
+                style={{
+                    width: '100%'
+                }}
+                params={{
+                    particles: {
+                        number: {
+                            value: 20,
+                            density: {
+                                enable: true,
+                                value_area: 800
+                            }
+                        },
+                        line_linked: {
+                            enable: false
+                        },
+                        move: {
+                            speed: 1,
+                            out_mode: 'out'
+                        },
+                        shape: {
+                            type: [
+                                'image',
+                                'circle'
+                            ],
+                            image: [
+                                {
+                                    src: face,
+                                    height: 30,
+                                    width: 30
+                                },
+                                {
+                                    src: face,
+                                    height: 30,
+                                    width: 30
+                                },
+                                {
+                                    src: face,
+                                    height: 30,
+                                    width: 30
+                                }
+                            ]
+                        },
+                        color: {
+                            value: '#CCC'
+                        },
+                        size: {
+                            value: 30,
+                            random: false,
+                            anim: {
+                                enable: true,
+                                speed: 4,
+                                size_min: 10,
+                                sync: false
+                            }
+                        }
+                    },
+                    retina_detect: false
+                }} />
             <VFX.VFXProvider>
-                <VFX.VFXImg src={face} width="100%" height="100%" shader="rgbShift"/>
+                <VFX.VFXImg src={face} width="70%" height="70%" shader="rgbShift"/>
             </VFX.VFXProvider>
             <form
                 onSubmit={handleSubmit}
@@ -125,10 +185,10 @@ const App = function () {
                 >
                     Найти пару
                 </button>
-                <button type="button" onClick={handleUpdate}>Очистить</button>
+                {/* <button type="button" onClick={handleUpdate}>Очистить</button> */}
             </form>
-            {state.sideUser?.name && <p>{`Тебе достался ${state.sideUser.name}`}</p>}
-            {state.message && <p>{state.message}</p>}
+            {state.sideUser?.name && <p style={{ color: 'white' }}>{`Тебе достался ${state.sideUser.name}`}</p>}
+            {state.message && <p style={{ color: 'white' }}>{state.message}</p>}
         </div>
     )
 }
