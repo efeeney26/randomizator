@@ -16,7 +16,10 @@ router.post('/', (req, res) => {
     User.find( {
         $and: [
                 { '_id': { $ne: currentUser } },
-                { 'giftFrom': '' }
+                { $or: [
+                        { 'giftTo': '', 'giftFrom': ''},
+                        { 'giftFrom': '' }
+                ]}
         ]
     }).exec()
         .then((sideUsers) => {
