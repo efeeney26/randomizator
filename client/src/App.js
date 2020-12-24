@@ -1,15 +1,45 @@
-import React, { useEffect, useState, useCallback } from 'react'
+import React, { useEffect, useCallback, useReducer } from 'react'
 import axios from 'axios'
 
 import style from './App.module.css'
 
+const initialState = {
+    users: [],
+    currentUserName: '',
+    sideUser: {},
+    message: ''
+}
+
+const reducer = (state, action) => {
+    switch (action.type) {
+        case 'SET_USERS':
+            return {
+                ...state,
+                users: action.users
+            }
+        case 'SET_CURRENT_USERNAME':
+            return {
+                ...state,
+                message: '',
+                currentUserName: action.currentUserName
+            }
+        case 'SET_SIDE_USER':
+            return {
+                ...state,
+                sideUser: action.sideUser
+            }
+        case 'SET_MESSAGE':
+            return {
+                ...state,
+                message: action.message
+            }
+        default:
+            return initialState
+    }
+}
+
 const App = function () {
-    const [users, setUsers] = useState([])
-    const [username, setUsername] = useState('')
-
-    const [user, setUser] = useState('')
-
-    const [errorMes, setErrorMes] = useState('')
+    const [state, dispatch] = useReducer(reducer, initialState)
 
     useEffect(() => {
         axios
@@ -21,13 +51,42 @@ const App = function () {
     useEffect(() => {
         axios
             .get('/api/users')
-            .then((users) => setUsers(users.data))
+            .then((res) => {
+                dispatch({ type: 'SET_USERS', users: res.data })
+            })
             .catch((err) => console.error(err))
-    }, [setUsers])
+    }, [dispatch])
 
     const handleChange = useCallback((e) => {
-        setUsername(e.target.value)
-    }, [setUsername])
+        dispatch({ type: 'SET_CURRENT_USERNAME', currentUserName: e.target.value })
+    }, [dispatch])
+
+    const handleSubmit = useCallback((e) => {
+        e.preventDefault()
+        if (state.currentUserName === '') {
+            alert('Please fill the username field')
+            return
+        }
+        const user = state.users.find((user) => user.name === state.currentUserName)
+        if (!user) {
+            dispatch({ type: 'SET_MESSAGE', message: `Нет такого пользователя ${state.currentUserName}` })
+        } else if (user?.giftTo) {
+            dispatch({ type: 'SET_MESSAGE', message: `У тебя уже есть кому дарить ${user.giftTo}` })
+        } else {
+            axios
+                .post('/api/users', { currentUser: user })
+                .then(res => {
+                    if (res?.data?.message) {
+                        dispatch({ type: 'SET_MESSAGE', message: res.data.message })
+                    }
+                    dispatch({ type: 'SET_SIDE_USER', sideUser: res?.data?.user })
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 4000)
+                })
+                .catch(e => console.error(e))
+        }
+    }, [state.users, state.currentUserName])
 
     const handleUpdate = useCallback(() => {
         axios
@@ -41,46 +100,14 @@ const App = function () {
             .catch(e => console.error(e))
     }, [])
 
-    const handleSubmit = useCallback((e) => {
-        e.preventDefault()
-        if (username === '') {
-            alert('Please fill the username field')
-            return
-        }
-        const user = users.find((user) => user.name === username)
-        if (!user) {
-            setErrorMes(`Нет такого пользователя ${username}`)
-        } else if (user?.giftTo) {
-            setErrorMes(`У тебя уже есть кому дарить ${user.giftTo}`)
-        } else {
-            axios
-                .post('/api/users', { currentUser: user })
-                .then(res => {
-                    if (res?.data?.message) {
-                        setErrorMes(res.data.message)
-                    }
-                    setUser(res?.data?.user)
-                    setTimeout(() => {
-                        window.location.reload()
-                    }, 4000)
-                })
-                .catch(e => console.error(e))
-        }
-    }, [users, username])
-
     return (
         <div className={style.container}>
             <div>
-                <h1>My Project</h1>
-                {users === null ? (
-                    <p>Loading...</p>
-                ) : users.length === 0 ? (
-                    <p>No user available</p>
-                ) : (
-                    <>
+                {state.users?.length
+                    ? <>
                         <h2>Available Users</h2>
                         <ol>
-                            {users.map((user) => (
+                            {state.users.map((user) => (
                                 <li key={user.name}>
                                     <p>Name: {user.name}</p>
                                     <p>giftTo: {user.giftTo}</p>
@@ -89,7 +116,8 @@ const App = function () {
                             ))}
                         </ol>
                     </>
-                )}
+                    : <h1>Пока никого нет</h1>
+                }
             </div>
             <div>
                 <form onSubmit={handleSubmit}>
@@ -98,11 +126,11 @@ const App = function () {
                         type="text"
                         placeholder="Enter your username"
                     />
-                    <button type="submit">Submit</button>
+                    <button type="submit" disabled={state.isSideUserLoading}>Submit</button>
                     <button type="button" onClick={handleUpdate}>Очистить</button>
                 </form>
-                {user?.name && <p>{`Тебе достался ${user.name}`}</p>}
-                {errorMes && <p>{errorMes}</p>}
+                {state.sideUser?.name && <p>{`Тебе достался ${state.sideUser.name}`}</p>}
+                {state.message && <p>{state.message}</p>}
             </div>
         </div>
     )
