@@ -38,14 +38,19 @@ const App = function () {
         const user = users.find((user) => user.name === username)
         if ( !user ) {
             setErrorMes(`Нет такого пользователя ${username}`)
-        } else if (user?.giftTo) {
-            setErrorMes(`У тебя уже есть ${user.giftTo}`)
+        } else if ( user?.giftTo ) {
+            setErrorMes(`У тебя уже есть кому дарить ${user.giftTo}`)
         } else {
             axios
                 .post("/api/users", { currentUser: user })
                 .then(res => {
-                    setUser(res.data.user)
-                    //window.location.reload()
+                    if (res?.data?.message) {
+                        setErrorMes(res.data.message)
+                    }
+                    setUser(res?.data?.user)
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 4000)
                 })
                 .catch(e => console.error(e));
         }
@@ -66,7 +71,6 @@ const App = function () {
                       {users.map((user) => (
                           <li key={user.name}>
                               <p>Name: {user.name}</p>
-                              <p>id: {user.id}</p>
                               <p>giftTo: {user.giftTo}</p>
                               <p>giftFrom: {user.giftFrom}</p>
                           </li>
