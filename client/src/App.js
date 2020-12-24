@@ -107,9 +107,6 @@ const App = function () {
     return (
         <div className={style.container} >
             <Particles
-                style={{
-                    width: '100%'
-                }}
                 params={{
                     particles: {
                         number: {
@@ -134,18 +131,28 @@ const App = function () {
                             image: [
                                 {
                                     src: face,
-                                    height: 30,
-                                    width: 30
+                                    height: 50,
+                                    width: 50
                                 },
                                 {
                                     src: face,
-                                    height: 30,
-                                    width: 30
+                                    height: 50,
+                                    width: 50
                                 },
                                 {
                                     src: face,
-                                    height: 30,
-                                    width: 30
+                                    height: 50,
+                                    width: 50
+                                },
+                                {
+                                    src: face,
+                                    height: 50,
+                                    width: 50
+                                },
+                                {
+                                    src: face,
+                                    height: 50,
+                                    width: 50
                                 }
                             ]
                         },
@@ -168,6 +175,7 @@ const App = function () {
             <VFX.VFXProvider>
                 <VFX.VFXImg src={face} width="70%" height="70%" shader="rgbShift"/>
             </VFX.VFXProvider>
+            {<p style={{ color: 'white' }}>Кол-во участников - {state.users.length}</p>}
             <form
                 onSubmit={handleSubmit}
                 className={style.form}
