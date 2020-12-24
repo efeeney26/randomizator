@@ -29,6 +29,18 @@ const App = function () {
         setUsername(e.target.value)
     }, [setUsername])
 
+    const handleUpdate = useCallback(() => {
+        axios
+            .put('/api/users', {})
+            .then((res) => {
+                console.log(res.data.message)
+                setTimeout(() => {
+                    window.location.reload()
+                }, 4000)
+            })
+            .catch(e => console.error(e))
+    }, [])
+
     const handleSubmit = useCallback((e) => {
         e.preventDefault()
         if (username === "") {
@@ -87,6 +99,7 @@ const App = function () {
                   placeholder="Enter your username"
               />
               <button type="submit">Submit</button>
+              <button type="button" onClick={handleUpdate}>Очистить</button>
           </form>
           {user?.name && <p>{`Тебе достался ${user.name}`}</p>}
           {errorMes && <p>{errorMes}</p>}

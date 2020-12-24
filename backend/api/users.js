@@ -39,4 +39,18 @@ router.post('/', (req, res) => {
         })
         .catch(e => console.error(e))
 })
+
+router.put('/', (req, res) => {
+    User.updateMany({}, {
+        $set: {
+            'giftTo': '',
+            'giftFrom': ''
+        }
+    })
+        .then(() => {
+            res.send({
+                message: 'Данные очищены'
+            })
+        })
+})
 module.exports = router
