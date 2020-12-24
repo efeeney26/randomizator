@@ -104,14 +104,26 @@ const App = function () {
         <div
             className={style.container}
         >
-            <div>
-                <form onSubmit={handleSubmit}>
+            <div
+                className={style.formContainer}
+            >
+                <form
+                    onSubmit={handleSubmit}
+                    className={style.form}
+                >
                     <input
+                        id="username"
                         onChange={handleChange}
                         type="text"
-                        placeholder="Enter your username"
+                        placeholder="Введи имя..."
+                        className={style.input}
                     />
-                    <button type="submit">Submit</button>
+                    <button
+                        type="submit"
+                        className={style.button}
+                    >
+                        Найти пару
+                    </button>
                     <button type="button" onClick={handleUpdate}>Очистить</button>
                 </form>
                 {state.sideUser?.name && <p>{`Тебе достался ${state.sideUser.name}`}</p>}
