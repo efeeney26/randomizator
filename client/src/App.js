@@ -101,24 +101,9 @@ const App = function () {
     }, [])
 
     return (
-        <div className={style.container}>
-            <div>
-                {state.users?.length
-                    ? <>
-                        <h2>Available Users</h2>
-                        <ol>
-                            {state.users.map((user) => (
-                                <li key={user.name}>
-                                    <p>Name: {user.name}</p>
-                                    <p>giftTo: {user.giftTo}</p>
-                                    <p>giftFrom: {user.giftFrom}</p>
-                                </li>
-                            ))}
-                        </ol>
-                    </>
-                    : <h1>Пока никого нет</h1>
-                }
-            </div>
+        <div
+            className={style.container}
+        >
             <div>
                 <form onSubmit={handleSubmit}>
                     <input
@@ -126,7 +111,7 @@ const App = function () {
                         type="text"
                         placeholder="Enter your username"
                     />
-                    <button type="submit" disabled={state.isSideUserLoading}>Submit</button>
+                    <button type="submit">Submit</button>
                     <button type="button" onClick={handleUpdate}>Очистить</button>
                 </form>
                 {state.sideUser?.name && <p>{`Тебе достался ${state.sideUser.name}`}</p>}

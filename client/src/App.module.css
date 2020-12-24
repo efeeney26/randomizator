@@ -1,4 +1,11 @@
 .container {
-  padding: 20px;
-  display: flex;
+  min-height: 100vh;
+  background: black center / contain no-repeat url("./assets/face.png");
+  background-size: 80%;
+}
+
+@media screen and (min-width: 900px) {
+  .container {
+    background-size: 40%;
+  }
 }
