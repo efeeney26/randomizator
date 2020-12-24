@@ -6,6 +6,12 @@ const UserSchema = new Schema({
     name: {
         type: String,
         required: true
+    },
+    giftTo: {
+        type: String
+    },
+    giftFrom: {
+        type: String
     }
 })
 

@@ -1,13 +1,9 @@
 const express = require('express');
-const router = express.Router()
+const { sample } = require('lodash')
 
 const User = require('../models/User');
 
-function randomInteger(min, max) {
-    // получить случайное число от (min-0.5) до (max+0.5)
-    let rand = min - 0.5 + Math.random() * (max - min + 1);
-    return Math.round(rand);
-}
+const router = express.Router()
 
 router.get('/', (req, res) => {
     User.find()
@@ -16,26 +12,21 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-    const { name } = req.body;
-    User.findOne( { name }).exec()
-        .then((user) => {
-            if (user) {
-                let id = randomInteger(1, 4)
-                while (id === user.id) {
-                    id = randomInteger(1, 4)
-                }
-                User.findOne( { id }).exec()
-                    .then((user) => {
-                        res.send({
-                            user
-                        })
-                    })
-            } else {
+    const currentUser = req.body.currentUser
+    User.find( {
+        $and: [
+                { '_id': { $ne: currentUser['_id'] } },
+                { 'giftFrom': '' }
+        ]
+    }).exec()
+        .then((sideUsers) => {
+            if (sideUsers.length) {
+                const randomSideUser = sample(sideUsers)
                 res.send({
-                    message: 'Нет такого'
+                    user: randomSideUser
                 })
             }
         })
-        .catch((e) => console.error(e))
+        .catch(e => console.error(e))
 })
 module.exports = router

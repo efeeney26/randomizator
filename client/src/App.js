@@ -1,5 +1,5 @@
 import React, {useEffect, useState, useCallback} from 'react'
-import axios from "axios";
+import axios from "axios"
 
 import style from './App.module.css'
 
@@ -8,7 +8,8 @@ const App = function () {
     const [username, setUsername] = useState("")
 
     const [user, setUser] = useState('')
-    const [message, setMessage] = useState('')
+
+    const [errorMes, setErrorMes] = useState('')
 
     useEffect(() => {
         axios
@@ -20,7 +21,7 @@ const App = function () {
     useEffect(() => {
         axios
             .get('/api/users')
-            .then((users) => setUsers(users))
+            .then((users) => setUsers(users.data))
             .catch((err) => console.error(err));
     }, [setUsers]);
 
@@ -34,20 +35,21 @@ const App = function () {
             alert("Please fill the username field");
             return;
         }
-        axios
-            .post("/api/users", {
-                name: username
-            })
-            .then(res => {
-                if (res?.data?.message) {
-                    setMessage(res.data.message)
-                } else {
+        const user = users.find((user) => user.name === username)
+        if ( !user ) {
+            setErrorMes(`Нет такого пользователя ${username}`)
+        } else if (user?.giftTo) {
+            setErrorMes(`У тебя уже есть ${user.giftTo}`)
+        } else {
+            axios
+                .post("/api/users", { currentUser: user })
+                .then(res => {
                     setUser(res.data.user)
                     //window.location.reload()
-                }
-            })
-            .catch(e => console.error(e));
-    }, [username])
+                })
+                .catch(e => console.error(e));
+        }
+    }, [users, username])
 
   return (
       <div className={style.container}>
@@ -61,8 +63,8 @@ const App = function () {
               <>
                   <h2>Available Users</h2>
                   <ol>
-                      {users.data.map((user, index) => (
-                          <li key={index}>
+                      {users.map((user) => (
+                          <li key={user.name}>
                               <p>Name: {user.name}</p>
                               <p>id: {user.id}</p>
                               <p>giftTo: {user.giftTo}</p>
@@ -83,7 +85,7 @@ const App = function () {
               <button type="submit">Submit</button>
           </form>
           {user?.name && <p>{`Тебе достался ${user.name}`}</p>}
-          {message && <p>{message}</p>}
+          {errorMes && <p>{errorMes}</p>}
           </div>
       </div>
   )
