@@ -1,5 +1,8 @@
 import React, { useEffect, useCallback, useReducer } from 'react'
 import axios from 'axios'
+import * as VFX from 'react-vfx'
+
+import face from './assets/face.png'
 
 import style from './App.module.css'
 
@@ -101,34 +104,31 @@ const App = function () {
     }, [])
 
     return (
-        <div
-            className={style.container}
-        >
-            <div
-                className={style.formContainer}
+        <div className={style.container} >
+            <VFX.VFXProvider>
+                <VFX.VFXImg src={face} width="100%" height="100%" shader="rgbShift"/>
+            </VFX.VFXProvider>
+            <form
+                onSubmit={handleSubmit}
+                className={style.form}
             >
-                <form
-                    onSubmit={handleSubmit}
-                    className={style.form}
+                <input
+                    id="username"
+                    onChange={handleChange}
+                    type="text"
+                    placeholder="Введи имя..."
+                    className={style.input}
+                />
+                <button
+                    type="submit"
+                    className={style.button}
                 >
-                    <input
-                        id="username"
-                        onChange={handleChange}
-                        type="text"
-                        placeholder="Введи имя..."
-                        className={style.input}
-                    />
-                    <button
-                        type="submit"
-                        className={style.button}
-                    >
-                        Найти пару
-                    </button>
-                    <button type="button" onClick={handleUpdate}>Очистить</button>
-                </form>
-                {state.sideUser?.name && <p>{`Тебе достался ${state.sideUser.name}`}</p>}
-                {state.message && <p>{state.message}</p>}
-            </div>
+                    Найти пару
+                </button>
+                <button type="button" onClick={handleUpdate}>Очистить</button>
+            </form>
+            {state.sideUser?.name && <p>{`Тебе достался ${state.sideUser.name}`}</p>}
+            {state.message && <p>{state.message}</p>}
         </div>
     )
 }

@@ -1,22 +1,11 @@
 .container{
   display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: center;
-  height: 100vh;
-  width: 100vw;
-  background: black top / contain no-repeat url("./assets/face.png");
-  background-size: 70%;
-}
-
-.formContainer {
-  padding: 0 20px;
-  height: 50vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-around;
+  min-height: 100vh;
+  min-width: 100vw;
+  background-color: black;
 }
 
 .form {
@@ -64,13 +53,10 @@
 
 @media (min-width: 960px){
   .container {
-    flex-direction: column;
-    background-position: left;
-    background-size: 40%;
-  }
-  .formContainer {
     height: 100vh;
-    width: 50vw;
+    width: 100vw;
+    flex-direction: row;
+    align-items: center;
   }
   .input, .button {
     padding: 10px;
