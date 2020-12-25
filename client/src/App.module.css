@@ -26,6 +26,7 @@
   border-radius: 5px;
   background-color: grey;
   color: white;
+  z-index: 100;
 }
 
 .input::placeholder {
@@ -42,6 +43,11 @@
   width: 50%;
   border-radius: 5px;
   color: white;
+  z-index: 100;
+}
+
+.button:disabled {
+  background-color: grey;
 }
 
 @media (min-width: 600px) and (max-width: 960px){
@@ -52,11 +58,19 @@
 
 @media (min-width: 960px){
   .container {
-    min-height: 100vh;
+    height: 100vh;
     flex-direction: row;
     align-items: center;
   }
   .input, .button {
     padding: 10px;
   }
+  .form >:not(:last-child) {
+    margin-bottom: 40px;
+  }
+}
+
+.test {
+  position: absolute;
+  z-index: 1;
 }

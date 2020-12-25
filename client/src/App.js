@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer } from 'react'
+import React, { useEffect, useCallback, useReducer, useState, useMemo } from 'react'
 import axios from 'axios'
 import * as VFX from 'react-vfx'
 import Particles from 'react-particles-js'
@@ -44,6 +44,9 @@ const reducer = (state, action) => {
 
 const App = function () {
     const [state, dispatch] = useReducer(reducer, initialState)
+    const [isLoading, setLoading] = useState(false)
+
+    const filteredUsers = useMemo(() => state.users.filter((user) => user?.giftFrom), [state.users])
 
     useEffect(() => {
         axios
@@ -68,7 +71,7 @@ const App = function () {
     const handleSubmit = useCallback((e) => {
         e.preventDefault()
         if (state.currentUserName === '') {
-            alert('Please fill the username field')
+            alert('Введи имя')
             return
         }
         const user = state.users.find((user) => user.name === state.currentUserName)
@@ -77,6 +80,7 @@ const App = function () {
         } else if (user?.giftTo) {
             dispatch({ type: 'SET_MESSAGE', message: `У тебя уже есть кому дарить ${user.giftTo}` })
         } else {
+            setLoading(true)
             axios
                 .post('/api/users', { currentUser: user })
                 .then(res => {
@@ -107,6 +111,10 @@ const App = function () {
     return (
         <div className={style.container} >
             <Particles
+                style={{
+                    position: 'fixed',
+                    height: '100vh'
+                }}
                 params={{
                     particles: {
                         number: {
@@ -175,11 +183,12 @@ const App = function () {
             <VFX.VFXProvider>
                 <VFX.VFXImg src={face} width="70%" height="70%" shader="rgbShift"/>
             </VFX.VFXProvider>
-            {<p style={{ color: 'white' }}>Кол-во участников - {state.users.length}</p>}
             <form
                 onSubmit={handleSubmit}
                 className={style.form}
             >
+                {<p style={{ color: 'white' }}>Кол-во участников - {state.users.length}</p>}
+                {<p style={{ color: 'white', marginTop: '0' }}>Участники с подарками - {filteredUsers.length}</p>}
                 <input
                     id="username"
                     onChange={handleChange}
@@ -190,13 +199,14 @@ const App = function () {
                 <button
                     type="submit"
                     className={style.button}
+                    disabled={isLoading}
                 >
                     Найти пару
                 </button>
                 {/* <button type="button" onClick={handleUpdate}>Очистить</button> */}
+                {state.sideUser?.name && <p style={{ color: 'white' }}>{`Тебе достался ${state.sideUser.name}`}</p>}
+                {state.message && <p style={{ color: 'white' }}>{state.message}</p>}
             </form>
-            {state.sideUser?.name && <p style={{ color: 'white' }}>{`Тебе достался ${state.sideUser.name}`}</p>}
-            {state.message && <p style={{ color: 'white' }}>{state.message}</p>}
         </div>
     )
 }
