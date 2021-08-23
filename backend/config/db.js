@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const connection = "mongodb+srv://efeeney:fgs1Cmprdan.@cluster0.ssw8z.mongodb.net/randomizator?retryWrites=true&w=majority";
+const connection = process.env.MONGODB_URI;
 
 mongoose.connect(connection,{
     useNewUrlParser: true,
