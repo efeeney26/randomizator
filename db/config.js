@@ -7,5 +7,5 @@ mongoose.connect(connection,{
     useUnifiedTopology: true,
     useFindAndModify: false
 })
-    .then(() => console.log("Database Connected Successfully"))
-    .catch(err => console.error(err));
+
+module.exports = mongoose.connection

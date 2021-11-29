@@ -1,24 +1,28 @@
-const express = require('express');
-const { sample } = require('lodash')
+const User = require('../models/user')
+const {sample} = require("lodash");
 
-const User = require('../models/User');
+exports.user_list = async (req, res) => {
+    try {
+        const users = await User.find()
+        res.send(users)
+    } catch (err) {
+        console.error(err)
+        res.status(500).send({ error: err })
+    }
+}
 
-const router = express.Router()
-
-router.get('/', (req, res) => {
-    User.find()
-        .then(users => res.json(users))
-        .catch(err => console.error(err))
-})
-
-router.post('/', (req, res) => {
-    const currentUser = req.body.currentUser
+exports.get_user_without_gift = (req, res) => {
+    const {
+        body: {
+            currentUser
+        }
+    } = req
     User.find( {
         $and: [
-                { '_id': { $ne: currentUser } },
-                { $or: [
-                        { 'giftTo': '', 'giftFrom': ''},
-                        { 'giftFrom': '' }
+            { '_id': { $ne: currentUser } },
+            { $or: [
+                    { 'giftTo': '', 'giftFrom': ''},
+                    { 'giftFrom': '' }
                 ]}
         ]
     }).exec()
@@ -41,19 +45,17 @@ router.post('/', (req, res) => {
             }
         })
         .catch(e => console.error(e))
-})
+}
 
-router.put('/', (req, res) => {
+exports.clear_data = (req, res) => {
     User.updateMany({}, {
         $set: {
             'giftTo': '',
             'giftFrom': ''
         }
-    })
-        .then(() => {
+    }).then(() => {
             res.send({
                 message: 'Данные очищены'
             })
         })
-})
-module.exports = router
+}
