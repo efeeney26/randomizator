@@ -1,17 +1,23 @@
 const User = require('../models/user')
-const {sample} = require("lodash");
+const { sample } = require("lodash");
 
-exports.user_list = async (req, res) => {
+exports.users_length_list = async (req, res) => {
     try {
-        const users = await User.find()
-        res.send(users)
+        const [usersLength, usersWithoutGiftLength] = await Promise.all([
+            await User.countDocuments(),
+            await User.countDocuments({ giftFrom: '' })
+        ])
+        res.send({
+            usersLength,
+            usersWithoutGiftLength
+        })
     } catch (err) {
         console.error(err)
         res.status(500).send({ error: err })
     }
 }
 
-exports.get_user_without_gift = (req, res) => {
+exports.get_random_user_without_gift = (req, res) => {
     const {
         body: {
             currentUser
@@ -58,4 +64,26 @@ exports.clear_data = (req, res) => {
                 message: 'Данные очищены'
             })
         })
+}
+
+exports.add_user = async (req, res) => {
+    const {
+        body: {
+            name
+        }
+    } = req
+    const newUser = {
+        name,
+        giftTo: '',
+        giftFrom: ''
+    }
+    try {
+        await User.create(newUser)
+        res.send({
+            message: 'Пользователь создан'
+        })
+    } catch (err) {
+        console.error(err)
+        res.status(500).send({ error: err })
+    }
 }
